@@ -1,22 +1,10 @@
 import { TopBar } from "../componets/layout/TopBar.tsx";
-
-const DashboardPage = () => {
-    return <>
-    <TopBar />
-    <div>dashboard</div>;
-    </>
-};
-
-export default DashboardPage;
-
-/*
 import { Container, Grid, CircularProgress, Alert } from "@mui/material";
-import { TopBar } from "../components/layout/TopBar";
-import { StatLabel } from "../components/dashboard/StatLabel";
-import { KshirutBarChart } from "../components/dashboard/KshirutBarChart";
-import { KshirutPieChart } from "../components/dashboard/KshirutPieChart";
-import { CarsTable } from "../components/dashboard/CarsTable";
-import { useCars } from "../hooks/useCars";
+import { StatLabel } from "../componets/dashboard/StatLabel.tsx";
+import { KshirutBarChart } from "../componets/dashboard/KshirutBarChart";
+import { KshirutPieChart } from "../componets/dashboard/KshirutPieChart";
+import { CarsTable } from "../componets/dashboard/CarsTable.tsx";
+//import { useCars } from "../hooks/useCars";
 export const DashboardPage = () => {
     const { cars, stats, isLoading, error } = useCars();
 
@@ -45,4 +33,4 @@ export const DashboardPage = () => {
             </Container>
         </>
     );
-};*/
+};
