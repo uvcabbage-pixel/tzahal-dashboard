@@ -43,7 +43,7 @@ export const LoginPage = () => {
         <Container maxWidth="xs" sx={{ mt: "6rem" }}>
             <Paper sx={{ p: "2rem" }} elevation={3}>
                 <Stack component="form" onSubmit={handleSubmit} spacing="1.25rem">
-                    <Typography variant="h5" textAlign="center">
+                    <Typography variant="h5" sx={{ textAlign: "center" }}>
                         התחברות למערכת
                     </Typography>
 
@@ -53,7 +53,9 @@ export const LoginPage = () => {
                         onChange={(e) => setPernr(e.target.value)}
                         error={Boolean(error)}
                         helperText={error || " "}
-                        inputProps={{ inputMode: "numeric" }}
+                        slotProps={{
+                            htmlInput: { inputMode: "numeric" },
+                        }}
                         autoFocus
                         fullWidth
                     />

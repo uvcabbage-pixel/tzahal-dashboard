@@ -18,7 +18,7 @@ export const TopBar = () => {
                 </Typography>
 
                 {user && (
-                    <Stack direction="row" spacing="0.75rem" alignItems="center">
+                    <Stack direction="row" spacing="0.75rem" sx={{alignItems: "center"}}>
                         <Typography variant="body2">
                             {user.pernr} · {user.gdud}
                         </Typography>

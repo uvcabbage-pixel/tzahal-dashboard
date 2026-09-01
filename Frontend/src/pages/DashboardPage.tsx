@@ -1,35 +1,77 @@
-import { TopBar } from "../componets/layout/TopBar.tsx";
-import { Container, Grid, CircularProgress, Alert } from "@mui/material";
-import { StatLabel } from "../componets/dashboard/StatLabel.tsx";
+import { Box, Container, CircularProgress, Alert } from "@mui/material";
+import { TopBar } from "../componets/layout/TopBar";
+import { StatLabel } from "../componets/dashboard/StatLabel";
 import { KshirutBarChart } from "../componets/dashboard/KshirutBarChart";
 import { KshirutPieChart } from "../componets/dashboard/KshirutPieChart";
-import { CarsTable } from "../componets/dashboard/CarsTable.tsx";
-//import { useCars } from "../hooks/useCars";
-export const DashboardPage = () => {
-    const { cars, stats, isLoading, error } = useCars();
+import { CarsTable } from "../componets/dashboard/CarsTable";
+import { useCars } from "../hooks/useCars";
+import { KSHIRUT_THRESHOLDS } from "../theme/theme";
 
-    if (isLoading) return <CircularProgress />;
-    if (error) return <Alert severity="error">{error}</Alert>;
+const statusText = (percentage: number): string => {
+    if (percentage < KSHIRUT_THRESHOLDS.low) return "נדרש טיפול";
+    if (percentage < KSHIRUT_THRESHOLDS.medium) return "תקין חלקית";
+    return "כשירות מלאה";
+};
+
+export const DashboardPage = () => {
+    const { cars, summary, isLoading, error } = useCars();
 
     return (
         <>
             <TopBar />
             <Container maxWidth="lg" sx={{ py: "2rem" }}>
-                <Grid container spacing="1.25rem">
-                    <Grid item xs={12} md={4}>
-                        <StatLabel variant="percentage" title="אחוז כשירות" value={overallPct} />
-                    </Grid>
-                    <Grid item xs={12} md={4}>
-                        <StatLabel variant="count" title="כלים כשירים" value={fitCount} unit="כלים" />
-                    </Grid>
-                    <Grid item xs={12} md={4}>
-                        <StatLabel variant="text" title="סטטוס כללי" value={statusText} />
-                    </Grid>
+                {isLoading && (
+                    <Box sx={{ display: "flex", justifyContent: "center", py: "4rem" }}>
+                        <CircularProgress />
+                    </Box>
+                )}
 
-                    <Grid item xs={12} md={8}><KshirutBarChart stats={stats} /></Grid>
-                    <Grid item xs={12} md={4}><KshirutPieChart fit={fitCount} unfit={unfitCount} /></Grid>
-                    <Grid item xs={12}><CarsTable cars={cars} /></Grid>
-                </Grid>
+                {!isLoading && error && <Alert severity="error">{error}</Alert>}
+
+                {!isLoading && !error && (
+                    <Box sx={{ display: "grid", gap: "1.25rem" }}>
+                        <Box
+                            sx={{
+                                display: "grid",
+                                gap: "1.25rem",
+                                gridTemplateColumns: {
+                                    xs: "1fr",
+                                    md: "repeat(3, 1fr)",
+                                },
+                            }}
+                        >
+                            <StatLabel
+                                variant="percentage"
+                                title="אחוז כשירות כולל"
+                                value={summary.percentage}
+                            />
+                            <StatLabel
+                                variant="count"
+                                title="כלים כשירים"
+                                value={summary.fit}
+                                unit="כלים"
+                            />
+                            <StatLabel
+                                variant="text"
+                                title="סטטוס כללי"
+                                value={statusText(summary.percentage)}
+                            />
+                        </Box>
+
+                        <Box
+                            sx={{
+                                display: "grid",
+                                gap: "1.25rem",
+                                gridTemplateColumns: { xs: "1fr", md: "2fr 1fr" },
+                            }}
+                        >
+                            <KshirutBarChart stats={summary.byMakat} />
+                            <KshirutPieChart fit={summary.fit} unfit={summary.unfit} />
+                        </Box>
+
+                        <CarsTable cars={cars} />
+                    </Box>
+                )}
             </Container>
         </>
     );
