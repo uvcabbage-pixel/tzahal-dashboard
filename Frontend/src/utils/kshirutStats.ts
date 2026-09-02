@@ -12,6 +12,8 @@ const toPercentage = (fit: number, total: number): number =>
     total === 0 ? 0 : Math.round((fit / total) * 100);
 
 export const calculateKshirut = (cars: Car[]): KshirutSummary => {
+
+    
     const groups = new Map<string, { total: number; fit: number }>();
 
     for (const car of cars) {

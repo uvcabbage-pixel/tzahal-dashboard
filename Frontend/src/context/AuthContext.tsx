@@ -8,9 +8,9 @@ import {
 } from "react";
 import type { AuthUser } from "../types/domain.types";
 import { api, tokenStorage } from "../api/axiosInstance";
+import { useEffect } from "react";
 
-// Flip to false once the backend login route exists.
-const USE_MOCK_AUTH = true;
+
 
 interface AuthContextValue {
     user: AuthUser | null;
@@ -22,17 +22,30 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+    useEffect(() => {
+    const restore = async (): Promise<void> => {
+        const token = tokenStorage.get();
+        if (!token) {
+            setIsLoading(false);
+            return;
+        }
+        try {
+            const { data } = await api.get<{ user: AuthUser }>("/auth/me");
+            setUser(data.user);
+        } catch {
+            tokenStorage.clear();
+        } finally {
+            setIsLoading(false);
+        }
+    };
+    void restore();
+    }, []);
     const [user, setUser] = useState<AuthUser | null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     const login = useCallback(async (pernr: string): Promise<void> => {
         setIsLoading(true);
         try {
-            if (USE_MOCK_AUTH) {
-                // Any pernr ending in 0 is treated as a manager, for testing.
-                setUser({ pernr, gdud: "גדוד 100", isManager: pernr.endsWith("0") });
-                return;
-            }
             const { data } = await api.post<{ token: string; user: AuthUser }>(
                 "/auth/login",
                 { pernr },

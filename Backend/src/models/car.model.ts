@@ -4,7 +4,7 @@ const carSchema = new Schema(
     {
         carNumber: { type: String, required: true, unique: true },
         makat: { type: String, required: true },
-        kshirot: { type: Number, required: true, enum: [0, 1] },
+        kshirot: { type: String, required: true, enum: ["0", "1"] },
         gdud: { type: String, required: true },
     },
     { collection: "carDatas", versionKey: false },
