@@ -16,6 +16,7 @@ export const buildTheme = (mode: ThemeMode): Theme =>
             background: {
                 default: mode === "light" ? "#f8fafc" : "#0f172a",
             },
+            secondary:{main: mode === "light" ? "#3fca11" : "#064216"}
         },
         typography: { fontFamily: "Inter, system-ui, sans-serif" },
         shape: { borderRadius: 12 },
