@@ -1,4 +1,3 @@
-// src/middleware/validate.middleware.ts
 import type { Request, Response, NextFunction, RequestHandler } from "express";
 import type { ValidationResult } from "../validators/auth.validator";
 

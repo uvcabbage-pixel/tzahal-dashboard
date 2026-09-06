@@ -1,4 +1,3 @@
-// src/routes/car.routes.ts
 import { Router } from "express";
 import { authenticate, requireManager } from "../middleware/auth.middleware";
 import { validateBody } from "../middleware/validate.middleware";
