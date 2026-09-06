@@ -13,7 +13,7 @@ import {
     TablePagination,
     Chip,
 } from "@mui/material";
-import type { Car } from "../../types/domain.types";
+import type { Car } from "@shared/domain.types";
 
 interface CarsTableProps {
     cars: Car[];
@@ -37,8 +37,7 @@ const COLUMNS: ColumnConfig[] = [
 const ROWS_PER_PAGE = 10;
 
 const compare = (a: Car, b: Car, key: SortableKey): number => {
-    if (key === "kshirot") return a.kshirot - b.kshirot;
-    // Numeric-aware string compare: "10" sorts after "9", not before.
+    if (key === "kshirot") return Number(a.kshirot) - Number(b.kshirot);
     return a[key].localeCompare(b[key], undefined, { numeric: true });
 };
 
@@ -104,8 +103,8 @@ export const CarsTable = ({ cars }: CarsTableProps) => {
                                     <TableCell>{car.makat}</TableCell>
                                     <TableCell align="center">
                                         <Chip
-                                            label={car.kshirot === 1 ? "כשיר" : "לא כשיר"}
-                                            color={car.kshirot === 1 ? "success" : "error"}
+                                            label={car.kshirot ? "כשיר" : "לא כשיר"}
+                                            color={car.kshirot ? "success" : "error"}
                                             size="small"
                                         />
                                     </TableCell>

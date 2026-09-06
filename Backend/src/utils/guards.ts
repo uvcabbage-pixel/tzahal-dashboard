@@ -6,6 +6,5 @@ export const isNonEmptyString = (value: unknown, maxLength = 100): value is stri
 
 export const isDigitsOnly = (value: unknown): value is string =>
     typeof value === "string" && /^\d+$/.test(value.trim());
-
-export const isBinary = (value: unknown): value is 0 | 1 =>
-    value === 0 || value === 1;
+export const isBoolean = (value: unknown): value is boolean =>
+    typeof value === "boolean";

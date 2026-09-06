@@ -1,4 +1,4 @@
-import type { Car, MakatStat } from "../types/domain.types";
+import type { Car, MakatStat } from "@shared/domain.types";
 
 export interface KshirutSummary {
     total: number;
@@ -19,7 +19,7 @@ export const calculateKshirut = (cars: Car[]): KshirutSummary => {
     for (const car of cars) {
         const current = groups.get(car.makat) ?? { total: 0, fit: 0 };
         current.total += 1;
-        if (car.kshirot === 1) current.fit += 1;
+        if (car.kshirot) current.fit += 1;
         groups.set(car.makat, current);
     }
 
@@ -32,7 +32,7 @@ export const calculateKshirut = (cars: Car[]): KshirutSummary => {
         }))
         .sort((a, b) => b.percentage - a.percentage);
 
-    const fit = cars.filter((car) => car.kshirot === 1).length;
+    const fit = cars.filter((car) => car.kshirot).length;
 
     return {
         total: cars.length,

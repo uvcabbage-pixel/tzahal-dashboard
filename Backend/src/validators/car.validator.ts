@@ -1,4 +1,4 @@
-import { isRecord, isNonEmptyString, isBinary } from "../utils/guards";
+import { isRecord, isNonEmptyString, isBoolean } from "../utils/guards";
 import type { ValidationResult, ValidationError } from "./auth.validator";
 //סידור ולידציה
 export interface CreateCarInput {
@@ -23,8 +23,8 @@ export const validateCreateCar = (body: unknown): ValidationResult<CreateCarInpu
     if (!isNonEmptyString(makat, 50)) {
         errors.push({ field: "makat", message: "מק\"ט אינו תקין" });
     }
-    if (!isBinary(kshirot)) {
-        errors.push({ field: "kshirot", message: "כשירות חייבת להיות 0 או 1" });
+    if (!isBoolean(kshirot)) {
+        errors.push({ field: "kshirot", message: "כשירות חייבת להיות ערך בוליאני" });
     }
     if (!isNonEmptyString(gdud, 50)) {
         errors.push({ field: "gdud", message: "גדוד אינו תקין" });

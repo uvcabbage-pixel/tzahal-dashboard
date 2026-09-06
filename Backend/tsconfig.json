@@ -4,7 +4,7 @@
         "module": "node16",
         "moduleResolution": "node16",
         "verbatimModuleSyntax": false,
-        "rootDir": "./src",
+        "rootDir": "..",
         "outDir": "./dist",
         "strict": true,
         "noImplicitAny": true,
@@ -15,6 +15,7 @@
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true
     },
-    "include": ["src/**/*"],
-    "exclude": ["node_modules", "dist"]
+    "ts-node": { "files": true },
+    "include": ["src/**/*.ts", "../shared/**/*.ts"],
+    "exclude": ["node_modules", "dist"],
 }

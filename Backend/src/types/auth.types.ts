@@ -1,12 +1,8 @@
 import type { Request } from "express";
+import type { AuthUser } from "./domain.types";
 
-export interface JwtPayloadData {
-    pernr: string;
-    gdud: string;
-    isManager: boolean;
-}
+export type JwtPayloadData = AuthUser;
 
-/** A request that has passed through `authenticate`. */
 export interface AuthedRequest extends Request {
     user: JwtPayloadData;
 }
