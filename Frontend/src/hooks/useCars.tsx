@@ -22,7 +22,6 @@ export const useCars = (): UseCarsResult => {
         setError("");
         try {
             const { data } =  await api.get<Car[]>("/cars");
-            console.log("response:", data); //להוריד
             setCars(data);
         } catch {
             setError("שגיאה בטעינת נתוני המכוניות");

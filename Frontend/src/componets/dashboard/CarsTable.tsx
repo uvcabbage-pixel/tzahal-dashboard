@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
     Card,
     CardContent,
@@ -9,6 +9,7 @@ import {
     TableContainer,
     TableHead,
     TableRow,
+    TableSortLabel,
     TablePagination,
     Chip,
 } from "@mui/material";
@@ -18,12 +19,54 @@ interface CarsTableProps {
     cars: Car[];
 }
 
-const ROWS_PER_PAGE = 10; 
+type SortableKey = "carNumber" | "makat" | "kshirot";
+type SortDirection = "asc" | "desc";
+
+interface ColumnConfig {
+    key: SortableKey;
+    label: string;
+    align: "left" | "center";
+}
+
+const COLUMNS: ColumnConfig[] = [
+    { key: "carNumber", label: "צ' הכלי", align: "left" },
+    { key: "makat", label: 'מק"ט', align: "left" },
+    { key: "kshirot", label: "כשירות", align: "center" },
+];
+
+const ROWS_PER_PAGE = 10;
+
+const compare = (a: Car, b: Car, key: SortableKey): number => {
+    if (key === "kshirot") return a.kshirot - b.kshirot;
+    // Numeric-aware string compare: "10" sorts after "9", not before.
+    return a[key].localeCompare(b[key], undefined, { numeric: true });
+};
 
 export const CarsTable = ({ cars }: CarsTableProps) => {
+    const [sortKey, setSortKey] = useState<SortableKey>("carNumber");
+    const [direction, setDirection] = useState<SortDirection>("asc");
     const [page, setPage] = useState<number>(0);
 
-    const visible = cars.slice(page * ROWS_PER_PAGE, page * ROWS_PER_PAGE + ROWS_PER_PAGE);
+    const handleSort = (key: SortableKey): void => {
+        if (key === sortKey) {
+            setDirection((prev) => (prev === "asc" ? "desc" : "asc"));
+        } else {
+            setSortKey(key);
+            setDirection("asc");
+        }
+        setPage(0);
+    };
+
+    const sorted = useMemo(() => {
+        const copy = [...cars];
+        copy.sort((a, b) => {
+            const result = compare(a, b, sortKey);
+            return direction === "asc" ? result : -result;
+        });
+        return copy;
+    }, [cars, sortKey, direction]);
+
+    const visible = sorted.slice(page * ROWS_PER_PAGE, page * ROWS_PER_PAGE + ROWS_PER_PAGE);
 
     return (
         <Card>
@@ -36,11 +79,24 @@ export const CarsTable = ({ cars }: CarsTableProps) => {
                     <Table size="small">
                         <TableHead>
                             <TableRow>
-                                <TableCell>צ&apos; הכלי</TableCell>
-                                <TableCell>מק&quot;ט</TableCell>
-                                <TableCell align="center">כשירות</TableCell>
+                                {COLUMNS.map((col) => (
+                                    <TableCell
+                                        key={col.key}
+                                        align={col.align}
+                                        sortDirection={sortKey === col.key ? direction : false}
+                                    >
+                                        <TableSortLabel
+                                            active={sortKey === col.key}
+                                            direction={sortKey === col.key ? direction : "asc"}
+                                            onClick={() => handleSort(col.key)}
+                                        >
+                                            {col.label}
+                                        </TableSortLabel>
+                                    </TableCell>
+                                ))}
                             </TableRow>
                         </TableHead>
+
                         <TableBody>
                             {visible.map((car) => (
                                 <TableRow key={car.carNumber} hover>
@@ -61,7 +117,7 @@ export const CarsTable = ({ cars }: CarsTableProps) => {
 
                 <TablePagination
                     component="div"
-                    count={cars.length}
+                    count={sorted.length}
                     page={page}
                     onPageChange={(_, newPage) => setPage(newPage)}
                     rowsPerPage={ROWS_PER_PAGE}

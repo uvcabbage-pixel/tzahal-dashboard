@@ -49,7 +49,18 @@ export const KshirutBarChart = ({ stats }: KshirutBarChartProps) => {
                 ticks: { callback: (value: string | number) => `${value}%` },
                 grid: { color: theme.palette.divider },
             },
-            x: { grid: { display: false } },
+            x: {
+                grid: { display: false },
+                ticks: {
+                    color: (ctx: { index: number }): string =>
+                        stats[ctx.index]?.fit === 0
+                            ? theme.palette.error.main
+                            : theme.palette.text.primary,
+                    font: (ctx: { index: number }) => ({
+                        weight: stats[ctx.index]?.fit === 0 ? 700 : 400,
+                    }),
+                },
+            },
         },
     };
 

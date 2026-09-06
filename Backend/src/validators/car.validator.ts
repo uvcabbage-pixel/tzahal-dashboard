@@ -1,8 +1,8 @@
 import { isRecord, isNonEmptyString, isBinary } from "../utils/guards";
 import type { ValidationResult, ValidationError } from "./auth.validator";
-
+//סידור ולידציה
 export interface CreateCarInput {
-    carNumber: string;
+    carNumber: string; //ליצור אורך מקסימלי לכל התווים
     makat: string;
     kshirot: 0 | 1;
     gdud: string;

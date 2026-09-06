@@ -6,7 +6,7 @@ import type { JwtPayloadData, AuthedRequest } from "../types/auth.types";
 export const authenticate = (req: Request, res: Response, next: NextFunction): void => {
     const header = req.headers.authorization;
     if (!header?.startsWith("Bearer ")) {
-        res.status(401).json({ message: "Unauthorized" });
+        res.status(401).json({ message: "Unauthorized" }); //לסדר את הסיפור
         return;
     }
     try {

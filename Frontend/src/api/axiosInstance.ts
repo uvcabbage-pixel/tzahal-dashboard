@@ -1,5 +1,4 @@
 import axios from "axios";
-
 const TOKEN_KEY = "auth_token";
 
 export const tokenStorage = {
@@ -21,7 +20,7 @@ api.interceptors.request.use((config) => {
 
 api.interceptors.response.use(
     (res) => res,
-    (error: unknown) => {
+    (error: unknown) => { //להתשמש בEROR
         if (axios.isAxiosError(error) && error.response?.status === 401) {
             tokenStorage.clear();
             if (window.location.pathname !== "/login") {

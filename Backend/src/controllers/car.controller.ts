@@ -33,7 +33,7 @@ export const createCar = async (
         const input = req.body as CreateCarInput;
 
         const exists = await CarModel.exists({ carNumber: input.carNumber });
-        if (exists) throw new AppError(409, "צ' זה כבר קיים במערכת");
+        if (exists) throw new AppError(409, "צ' זה כבר קיים במערכת"); //להעביר לולידטור
 
         const created = await CarModel.create({
             carNumber: input.carNumber,
