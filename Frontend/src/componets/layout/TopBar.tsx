@@ -36,7 +36,7 @@ export const TopBar = () => {
                     {mode === "light" ? <DarkModeIcon /> : <LightModeIcon />}
                 </IconButton>
 
-                {user?.isManager && (
+                {user.isManager && (
                     <Button color="inherit" component={RouterLink} to="/cars/new">
                         הוספת צ&apos;
                     </Button>

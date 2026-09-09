@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { api } from "../api/axiosInstance";
 import { calculateKshirut, type KshirutSummary } from "../utils/kshirutStats";
-import type { Car } from "../types/domain.types";
+import type { Car } from "../../../shared/domain.types";
 
 interface UseCarsResult {
     cars: Car[];

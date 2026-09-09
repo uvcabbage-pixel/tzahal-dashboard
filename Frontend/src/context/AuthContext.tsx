@@ -6,7 +6,7 @@ import {
     useMemo,
     type ReactNode,
 } from "react";
-import type { AuthUser } from "../types/domain.types";
+import type { AuthUser } from "@shared/domain.types";
 import { api, tokenStorage } from "../api/axiosInstance";
 import { useEffect } from "react";
 
@@ -75,4 +75,3 @@ export const useAuth = (): AuthContextValue => {
     if (!ctx) throw new Error("useAuth must be used within AuthProvider");
     return ctx;
 };
-//TODO: מאבד גישה אחרי רענון

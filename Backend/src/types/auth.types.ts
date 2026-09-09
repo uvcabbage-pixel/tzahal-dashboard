@@ -1,5 +1,5 @@
 import type { Request } from "express";
-import type { AuthUser } from "./domain.types";
+import type { AuthUser } from "../../../shared/domain.types";
 
 export type JwtPayloadData = AuthUser;
 

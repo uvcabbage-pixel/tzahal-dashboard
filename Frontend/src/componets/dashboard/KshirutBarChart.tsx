@@ -1,6 +1,6 @@
 import { Bar } from "react-chartjs-2";
 import { Card, CardContent, Typography, Box, useTheme } from "@mui/material";
-import type { MakatStat } from "../../types/domain.types";
+import type { MakatStat } from "@shared/domain.types";
 import { KSHIRUT_THRESHOLDS } from "../../theme/theme";
 
 interface KshirutBarChartProps {
