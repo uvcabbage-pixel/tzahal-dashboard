@@ -1,25 +1,24 @@
 import { useState, useMemo } from "react";
 import {
+    Autocomplete,
+    Button,
     Card,
     CardContent,
-    Typography,
+    Chip,
     Stack,
-    TextField,
-    ToggleButton,
-    ToggleButtonGroup,
     Table,
     TableBody,
     TableCell,
     TableContainer,
     TableHead,
+    TablePagination,
     TableRow,
     TableSortLabel,
-    TablePagination,
-    Chip,
-    InputAdornment,
-    IconButton,
+    TextField,
+    ToggleButton,
+    ToggleButtonGroup,
+    Typography,
 } from "@mui/material";
-import ClearIcon from "@mui/icons-material/Clear";
 import type { Car } from "@shared/domain.types";
 
 interface CarsTableProps {
@@ -54,14 +53,30 @@ const matchesStatus = (car: Car, filter: StatusFilter): boolean => {
     return filter === "fit" ? car.kshirot : !car.kshirot;
 };
 
+const uniqueSorted = (values: string[]): string[] =>
+    Array.from(new Set(values)).sort((a, b) =>
+        a.localeCompare(b, undefined, { numeric: true }),
+    );
+
 export const CarsTable = ({ cars }: CarsTableProps) => {
+    // --- filter state ---
     const [carNumberQuery, setCarNumberQuery] = useState<string>("");
-    const [makatQuery, setMakatQuery] = useState<string>("");
+    const [makatFilters, setMakatFilters] = useState<string[]>([]);
+    const [makatInput, setMakatInput] = useState<string>("");
     const [status, setStatus] = useState<StatusFilter>("all");
 
+    // --- sort / pagination state ---
     const [sortKey, setSortKey] = useState<SortableKey>("carNumber");
     const [direction, setDirection] = useState<SortDirection>("asc");
     const [page, setPage] = useState<number>(0);
+
+    // Suggestion lists are derived from the data, so they stay in sync
+    // automatically when a manager adds a vehicle.
+    const carNumberOptions = useMemo(
+        () => uniqueSorted(cars.map((c) => c.carNumber)),
+        [cars],
+    );
+    const makatOptions = useMemo(() => uniqueSorted(cars.map((c) => c.makat)), [cars]);
 
     const handleSort = (key: SortableKey): void => {
         if (key === sortKey) {
@@ -73,27 +88,54 @@ export const CarsTable = ({ cars }: CarsTableProps) => {
         setPage(0);
     };
 
+    const clearFilters = (): void => {
+        setCarNumberQuery("");
+        setMakatFilters([]);
+        setMakatInput("");
+        setStatus("all");
+        setPage(0);
+    };
+
+    const hasActiveFilters =
+        carNumberQuery.trim().length > 0 ||
+        makatFilters.length > 0 ||
+        makatInput.trim().length > 0 ||
+        status !== "all";
+
     const processed = useMemo(() => {
-        const car = carNumberQuery.trim().toLowerCase();
-        const makat = makatQuery.trim().toLowerCase();
+        const carQuery = carNumberQuery.trim().toLowerCase();
+        const typedMakat = makatInput.trim().toLowerCase();
+
+        // Committed chips are OR'd together; uncommitted typing also counts,
+        // so the table narrows while the user is still typing.
+        const matchesMakat = (car: Car): boolean => {
+            if (makatFilters.length === 0 && typedMakat.length === 0) return true;
+            const value = car.makat.toLowerCase();
+            const chipHit = makatFilters.some((f) => value.includes(f.toLowerCase()));
+            const typedHit = typedMakat.length > 0 && value.includes(typedMakat);
+            return chipHit || typedHit;
+        };
 
         const filtered = cars.filter(
             (c) =>
-                c.carNumber.toLowerCase().includes(car) &&
-                c.makat.toLowerCase().includes(makat) &&
+                c.carNumber.toLowerCase().includes(carQuery) &&
+                matchesMakat(c) &&
                 matchesStatus(c, status),
         );
 
+        // filter() already returned a new array, so sorting in place is safe here.
         filtered.sort((a, b) => {
             const result = compare(a, b, sortKey);
             return direction === "asc" ? result : -result;
         });
 
         return filtered;
-    }, [cars, carNumberQuery, makatQuery, status, sortKey, direction]);
+    }, [cars, carNumberQuery, makatFilters, makatInput, status, sortKey, direction]);
 
-    const visible = processed.slice(page * ROWS_PER_PAGE, page * ROWS_PER_PAGE + ROWS_PER_PAGE);
-
+    const visible = processed.slice(
+        page * ROWS_PER_PAGE,
+        page * ROWS_PER_PAGE + ROWS_PER_PAGE,
+    );
 
     return (
         <Card>
@@ -103,60 +145,56 @@ export const CarsTable = ({ cars }: CarsTableProps) => {
                 </Typography>
 
                 <Stack
-                    direction={{ xs: "column", sm: "row" }}
+                    direction={{ xs: "column", md: "row" }}
                     spacing="1rem"
-                    sx={{ mb: "1.25rem", alignItems: "center" }}
+                    sx={{ mb: "1rem", alignItems:"flex-start" }}
                 >
-                    <TextField
-                        label="חיפוש לפי צ'"
-                        size="small"
-                        value={carNumberQuery}
-                        onChange={(e) => {
-                            setCarNumberQuery(e.target.value);
+                    <Autocomplete
+                        freeSolo
+                        options={carNumberOptions}
+                        inputValue={carNumberQuery}
+                        onInputChange={(_, value) => {
+                            setCarNumberQuery(value);
                             setPage(0);
                         }}
-                        slotProps={{
-                            input: {
-                                endAdornment: carNumberQuery ? (
-                                    <InputAdornment position="end">
-                                        <IconButton
-                                            size="small"
-                                            onClick={() => setCarNumberQuery("")}
-                                            aria-label="נקה חיפוש"
-                                        >
-                                            <ClearIcon fontSize="inherit" />
-                                        </IconButton>
-                                    </InputAdornment>
-                                ) : undefined,
-                            },
-                        }}
+                        filterOptions={(options, state) =>
+                            state.inputValue.trim().length === 0
+                                ? []
+                                : options
+                                      .filter((o) => o.includes(state.inputValue.trim()))
+                                      .slice(0, 50)
+                        }
                         fullWidth
+                        renderInput={(params) => (
+                            <TextField {...params} label="חיפוש לפי צ'" size="small" />
+                        )}
                     />
 
-                    <TextField
-                        label='חיפוש לפי מק"ט'
-                        size="small"
-                        value={makatQuery}
-                        onChange={(e) => {
-                            setMakatQuery(e.target.value);
+                    <Autocomplete
+                        multiple
+                        freeSolo
+                        options={makatOptions}
+                        value={makatFilters}
+                        onChange={(_, next) => {
+                            setMakatFilters(next as string[]);
                             setPage(0);
                         }}
-                        slotProps={{
-                            input: {
-                                endAdornment: makatQuery ? (
-                                    <InputAdornment position="end">
-                                        <IconButton
-                                            size="small"
-                                            onClick={() => setMakatQuery("")}
-                                            aria-label="נקה חיפוש"
-                                        >
-                                            <ClearIcon fontSize="inherit" />
-                                        </IconButton>
-                                    </InputAdornment>
-                                ) : undefined,
-                            },
+                        inputValue={makatInput}
+                        onInputChange={(_, value) => {
+                            setMakatInput(value);
+                            setPage(0);
                         }}
                         fullWidth
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label='חיפוש לפי מק"ט'
+                                size="small"
+                                placeholder={
+                                    makatFilters.length === 0 ? 'הקלד או בחר מק"ט' : ""
+                                }
+                            />
+                        )}
                     />
 
                     <ToggleButtonGroup
@@ -176,9 +214,20 @@ export const CarsTable = ({ cars }: CarsTableProps) => {
                     </ToggleButtonGroup>
                 </Stack>
 
-                <Typography variant="body2" color="text.secondary" sx={{ mb: "0.75rem" }}>
-                    מציג {processed.length} מתוך {cars.length} כלים
-                </Typography>
+                <Stack
+                    direction="row"
+                    spacing="0.75rem"
+                    sx={{ mb: "0.75rem", alignItems: "center" }}
+                >
+                    <Typography variant="body2" color="text.secondary">
+                        מציג {processed.length} מתוך {cars.length} כלים
+                    </Typography>
+                    {hasActiveFilters && (
+                        <Button size="small" onClick={clearFilters}>
+                            נקה סינון
+                        </Button>
+                    )}
+                </Stack>
 
                 <TableContainer>
                     <Table size="small">
@@ -206,7 +255,11 @@ export const CarsTable = ({ cars }: CarsTableProps) => {
                             {visible.length === 0 ? (
                                 <TableRow>
                                     <TableCell colSpan={COLUMNS.length} align="center">
-                                        <Typography variant="body2" color="text.secondary" sx={{ py: "1.5rem" }}>
+                                        <Typography
+                                            variant="body2"
+                                            color="text.secondary"
+                                            sx={{ py: "1.5rem" }}
+                                        >
                                             לא נמצאו כלים התואמים לסינון
                                         </Typography>
                                     </TableCell>
