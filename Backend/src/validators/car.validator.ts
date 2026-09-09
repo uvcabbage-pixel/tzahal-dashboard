@@ -1,10 +1,10 @@
-import { isRecord, isNonEmptyString, isBoolean } from "../utils/guards";
+import { isRecord, isDigitsOnly, isBoolean } from "../utils/guards";
 import type { ValidationResult, ValidationError } from "./auth.validator";
-//סידור ולידציה
-export interface CreateCarInput {
-    carNumber: string; //ליצור אורך מקסימלי לכל התווים
+
+export interface CreateCarInput { //זה שונה מdomain.type כי זה מיצג את תשובת new cars
+    carNumber: string;
     makat: string;
-    kshirot: 0 | 1;
+    kshirot: boolean;
     gdud: string;
 }
 
@@ -17,17 +17,17 @@ export const validateCreateCar = (body: unknown): ValidationResult<CreateCarInpu
 
     const { carNumber, makat, kshirot, gdud } = body;
 
-    if (!isNonEmptyString(carNumber, 20)) {
-        errors.push({ field: "carNumber", message: "צ' הכלי אינו תקין" });
+    if (!isDigitsOnly(carNumber)) {
+        errors.push({ field: "carNumber", message: "צ' הכלי חייב להכיל ספרות בלבד" });
     }
-    if (!isNonEmptyString(makat, 50)) {
-        errors.push({ field: "makat", message: "מק\"ט אינו תקין" });
+    if (!isDigitsOnly(makat)) {
+        errors.push({ field: "makat", message: 'מק"ט חייב להכיל ספרות בלבד' });
+    }
+    if (!isDigitsOnly(gdud)) {
+        errors.push({ field: "gdud", message: "גדוד חייב להכיל ספרות בלבד" });
     }
     if (!isBoolean(kshirot)) {
         errors.push({ field: "kshirot", message: "כשירות חייבת להיות ערך בוליאני" });
-    }
-    if (!isNonEmptyString(gdud, 50)) {
-        errors.push({ field: "gdud", message: "גדוד אינו תקין" });
     }
 
     if (errors.length > 0) return { success: false, errors };
@@ -37,7 +37,7 @@ export const validateCreateCar = (body: unknown): ValidationResult<CreateCarInpu
         data: {
             carNumber: (carNumber as string).trim(),
             makat: (makat as string).trim(),
-            kshirot: kshirot as 0 | 1,
+            kshirot: kshirot as boolean,
             gdud: (gdud as string).trim(),
         },
     };

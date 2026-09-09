@@ -33,6 +33,8 @@ const EMPTY_FORM: FormState = {
     gdud: "",
 };
 
+const isDigits = (value: string): boolean => /^\d+$/.test(value.trim());
+
 export const AddCarPage = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
@@ -50,11 +52,27 @@ export const AddCarPage = () => {
     };
 
     const validate = (): FieldErrors => {
-        const errors: FieldErrors = {};
-        if (!form.carNumber.trim()) errors.carNumber = "יש להזין צ' כלי";
-        if (!form.makat.trim()) errors.makat = 'יש להזין מק"ט';
-        if (!form.gdud.trim()) errors.gdud = "יש להזין גדוד";
-        return errors;
+    const errors: FieldErrors = {};
+
+    if (!form.carNumber.trim()) {
+        errors.carNumber = "יש להזין צ' כלי";
+    } else if (!isDigits(form.carNumber)) {
+        errors.carNumber = "צ' הכלי חייב להכיל ספרות בלבד";
+    }
+
+    if (!form.makat.trim()) {
+        errors.makat = 'יש להזין מק"ט';
+    } else if (!isDigits(form.makat)) {
+        errors.makat = 'מק"ט חייב להכיל ספרות בלבד';
+    }
+
+    if (!form.gdud.trim()) {
+        errors.gdud = "יש להזין גדוד";
+    } else if (!isDigits(form.gdud)) {
+        errors.gdud = "גדוד חייב להכיל ספרות בלבד";
+    }
+
+    return errors;
     };
 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
